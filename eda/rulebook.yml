@@ -1,0 +1,34 @@
+---
+- name: Hue motion → AAP Demo Job
+  hosts: all
+
+  sources:
+    - ansible.eda.mqtt:
+        host: localhost
+        port: 1883
+        # Subscribe to all motion resources published by hue_to_mqtt.py
+        topics:
+          - hue/motion/#
+        # Optional auth if your broker requires it
+        # username: "{{ lookup('env', 'MQTT_USER') }}"
+        # password: "{{ lookup('env', 'MQTT_PASS') }}"
+        tls: false
+        client_id: hue-eda-listener
+
+  rules:
+    - name: Motion detected
+      condition: >-
+        event.payload and
+        event.payload.type == "motion" and
+        event.payload.motion and
+        event.payload.motion.motion == true
+      action:
+        run_job_template:
+          name: Demo Job Template
+          # Adjust if your org name differs
+          organization: Default
+          # Pass along context if useful to your JT
+          extra_vars:
+            sensor_id: "{{ event.payload.id }}"
+            id_v1: "{{ event.payload.id_v1 | default('') }}"
+            changed_at: "{{ event.payload.motion.motion_report.changed | default('') }}"

@@ -1,0 +1,26 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2-openssl
+    container_name: hue-booth-mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "8883:8883"
+    volumes:
+      - ./config:/mosquitto/config:ro
+      - ./data:/mosquitto/data
+      - ./log:/mosquitto/log
+    environment:
+      - TZ=${TZ:-UTC}
+    # For Podman Desktop compatibility
+    healthcheck:
+      test: ["CMD-SHELL", "mosquitto -c /mosquitto/config/mosquitto.conf -p 0 -v -d || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  data:
+  log:
+
