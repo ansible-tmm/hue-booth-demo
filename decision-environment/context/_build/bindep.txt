@@ -1,0 +1,6 @@
+gcc
+make
+redhat-rpm-config
+python3.11-devel
+systemd-devel
+pkgconf-pkg-config

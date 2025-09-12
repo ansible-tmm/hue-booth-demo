@@ -3,7 +3,8 @@
   hosts: all
 
   sources:
-    - ansible.eda.mqtt:
+    # Use the local plugin 'mqtt_simple' (run with: ansible-rulebook -S extensions/eda)
+    - mqtt_simple:
         host: localhost
         port: 1883
         # Subscribe to all motion resources published by hue_to_mqtt.py
@@ -13,7 +14,6 @@
         # username: "{{ lookup('env', 'MQTT_USER') }}"
         # password: "{{ lookup('env', 'MQTT_PASS') }}"
         tls: false
-        client_id: hue-eda-listener
 
   rules:
     - name: Motion detected
