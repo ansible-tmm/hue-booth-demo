@@ -25,3 +25,4 @@ mqtt/config/passwords
 *.key
 *.pem
 *.pfx
+*.gz

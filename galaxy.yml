@@ -1,0 +1,18 @@
+namespace: ipvsean
+name: hue_booth_demo
+version: 0.1.0
+readme: README.md
+authors:
+  - Ansible TMM <tmm@redhat.com>
+description: "Event-Driven Ansible MQTT event source plugin (mqtt_simple) for Hue demo"
+license: ["Apache-2.0"]
+repository: https://github.com/ansible-tmm/hue-booth-demo
+issues: https://github.com/ansible-tmm/hue-booth-demo/issues
+tags: ["mqtt", "hue", "eda", "ansible"]
+build_ignore:
+  - "collections-src/"
+  - "**/.git*"
+  - "**/.venv*"
+  - "**/__pycache__"
+  - "**/*.pyc"
+  - "**/tests"

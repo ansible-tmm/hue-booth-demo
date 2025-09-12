@@ -1,7 +1,7 @@
 # hue-booth-demo
 Using Ansible Automation Platform &amp; Philips Hue
 
-Note: This repo includes a simple Event-Driven Ansible MQTT event source plugin under `extensions/eda/plugins/event_source/mqtt_simple.py`, suitable for publishing on Ansible Galaxy (e.g., namespace `ansible-tmm.hue-booth-demo`).
+Note: This repo includes a simple Event-Driven Ansible MQTT event source plugin at `plugins/event_source/mqtt_simple.py`, suitable for publishing on Ansible Galaxy (e.g., namespace `ansible_tmm.hue_booth_demo`).
 
 # Setup
 

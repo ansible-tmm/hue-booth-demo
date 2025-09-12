@@ -3,8 +3,8 @@
   hosts: all
 
   sources:
-    # Use the local plugin 'mqtt_simple' (run with: ansible-rulebook -S extensions/eda)
-    - mqtt_simple:
+    # Use the packaged plugin from this repo as a collection (when installed) or load locally with -S .
+    - ipvsean.hue_booth_demo.mqtt_simple:
         host: localhost
         port: 1883
         # Subscribe to all motion resources published by hue_to_mqtt.py
