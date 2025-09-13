@@ -1,5 +1,5 @@
 ---
-- name: Hue motion → Job (final)
+- name: Hue motion → Job (final v2)
   hosts: all
 
   sources:
@@ -10,32 +10,33 @@
         tls: false
 
   rules:
-    # Fire ONLY when motion is true
-    - name: Motion detected -> Job
+    # 1) Fire ONLY when motion is true
+    - name: Motion detected -> print + launch JT
       condition:
         all:
-          - event.payload.motion is defined
-          - event.payload.motion.motion == true
-      action:
-        run_job_template:
-          name: Demo Job Template
-          organization: Default
-          job_args:
-            extra_vars:
-              sensor_id: "{{ event.payload.id }}"
-              id_v1: "{{ event.payload.id_v1 | default('') }}"
-              changed_at: "{{ event.payload.motion.motion_report.changed | default('') }}"
+          - event.payload is defined
+          - event.payload["motion"] is defined
+          - event.payload["motion"]["motion"] == true
+      actions:
+        - print_event: {}   # <-- you will see a full [event] block when this matches
+        - debug:
+            msg: >-
+              LAUNCHING JT: sensor={{ event.payload.id }}
+              at={{ event.payload.motion.motion_report.changed | default('') }}
+        - run_job_template:
+            name: Demo Job Template
+            organization: Default
+            job_args:
+              extra_vars:
+                sensor_id: "{{ event.payload.id }}"
+                id_v1: "{{ event.payload.id_v1 | default('') }}"
+                changed_at: "{{ event.payload.motion.motion_report.changed | default('') }}"
 
-    # Optional: log any motion events (true *or* false) for visibility
+    # 2) Helpful visibility on all motion events (true *and* false)
     - name: Motion event observed
       condition:
         all:
-          - event.payload.motion is defined
-      action:
-        print_event: {}
-
-    # Optional: last resort catch-all (put LAST!)
-    - name: Catch-all (debug)
-      condition: true
+          - event.payload is defined
+          - event.payload["motion"] is defined
       action:
         print_event: {}
