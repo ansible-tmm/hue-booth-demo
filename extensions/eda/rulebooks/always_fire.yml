@@ -1,5 +1,5 @@
 ---
-- name: Hue motion → Job (final v4)
+- name: Hue motion → Job (final v4 TEST)
   hosts: all
 
   sources:
@@ -13,11 +13,13 @@
     - name: TEST: force one-time JT launch
       condition: true
       actions:
-        - debug: { msg: "TEST: launching Demo Job Template from EDA" }
+        - debug:
+            msg: "TEST: launching Demo Job Template from EDA"
         - run_job_template:
             name: Demo Job Template
             organization: Default
             job_args:
               extra_vars:
                 sensor_id: "TEST"
-                changed_at: "{{ now() }}"
+                changed_at: "{{ event.meta.received_at | default('') }}"
+                # or: changed_at: "manual-test"
