@@ -19,8 +19,6 @@
           - event.payload is defined
           - event.payload.motion is defined
           - event.payload.motion.motion        # truthy check
-      throttle:
-        once_within: 5    # avoid rapid re-triggers; tweak as you like
       actions:
         - debug:
             msg: >-
