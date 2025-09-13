@@ -11,12 +11,27 @@
         tls: false
 
   rules:
-    - name: Motion detected
-      condition: >-
-        event.payload and
-        event.payload.type == "motion" and
-        event.payload.motion and
-        event.payload.motion.motion
+    # Sanity rule: prove we match every "motion" event
+    - name: Sanity: saw a motion-type event
+      condition:
+        all:
+          - event.payload is defined
+          - event.payload.type == "motion"
+      action:
+        debug:
+          msg: >-
+            MOTION EVENT: id={{ event.payload.id }}
+            active={{ event.payload.motion.motion | default('n/a') }}
+            at={{ event.payload.motion.motion_report.changed | default('') }}
+
+    # Fire only when motion is true
+    - name: Motion detected (fire job)
+      condition:
+        all:
+          - event.payload is defined
+          - event.payload.type == "motion"
+          - event.payload.motion is defined
+          - event.payload.motion.motion == true
       action:
         run_job_template:
           name: Demo Job Template
