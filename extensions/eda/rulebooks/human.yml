@@ -15,19 +15,14 @@
     - name: Motion detected launching job template for demo
       condition: event.payload.motion.motion
       action:
-        # - print_event: {}   # proves the rule matched with a full [event] block
-        # - debug:
-        #     msg: >-
-        #       LAUNCHING JT: sensor={{ event.payload.id }}
-        #       at={{ event.payload.motion.motion_report.changed | default('') }}
-        - run_job_template:
-            name: Demo Job Template
-            organization: Default
-            job_args:
-              extra_vars:
-                sensor_id: "{{ event.payload.id }}"
-                id_v1: "{{ event.payload.id_v1 | default('') }}"
-                changed_at: "{{ event.payload.motion.motion_report.changed | default('') }}"
+        run_job_template:
+          name: Demo Job Template
+          organization: Default
+          job_args:
+            extra_vars:
+              sensor_id: "{{ event.payload.id }}"
+              id_v1: "{{ event.payload.id_v1 | default('') }}"
+              changed_at: "{{ event.payload.motion.motion_report.changed | default('') }}"
 
     # Optional: log ALL motion events (true & false). Keep AFTER the job rule.
     - name: Motion event observed (log)
