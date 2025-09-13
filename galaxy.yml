@@ -1,6 +1,6 @@
 namespace: ipvsean
 name: hue_booth_demo
-version: 0.1.0
+version: 0.1.1
 readme: README.md
 authors:
   - Ansible TMM <tmm@redhat.com>

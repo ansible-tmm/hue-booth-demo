@@ -1,0 +1,19 @@
+---
+- name: Hue MQTT debug
+  hosts: all
+
+  sources:
+    - ipvsean.hue_booth_demo.mqtt_simple:
+        host: 192.168.1.27
+        port: 1883
+        topics:
+          - hue/#
+
+  rules:
+    - name: Print every incoming event
+      condition: true
+      action:
+        debug:
+          msg: >-
+            topic={{ event.topic|string }}
+            payload={{ event.payload|to_json }}

@@ -3,16 +3,11 @@
   hosts: all
 
   sources:
-    # Use the packaged plugin from this repo as a collection (when installed) or load locally with -S .
     - ipvsean.hue_booth_demo.mqtt_simple:
         host: mqtt-broker
         port: 1883
-        # Subscribe to all motion resources published by hue_to_mqtt.py
         topics:
           - hue/motion/#
-        # Optional auth if your broker requires it
-        # username: "{{ lookup('env', 'MQTT_USER') }}"
-        # password: "{{ lookup('env', 'MQTT_PASS') }}"
         tls: false
 
   rules:
@@ -21,14 +16,13 @@
         event.payload and
         event.payload.type == "motion" and
         event.payload.motion and
-        event.payload.motion.motion == true
+        event.payload.motion.motion
       action:
         run_job_template:
           name: Demo Job Template
-          # Adjust if your org name differs
           organization: Default
-          # Pass along context if useful to your JT
-          extra_vars:
-            sensor_id: "{{ event.payload.id }}"
-            id_v1: "{{ event.payload.id_v1 | default('') }}"
-            changed_at: "{{ event.payload.motion.motion_report.changed | default('') }}"
+          job_args:
+            extra_vars:
+              sensor_id: "{{ event.payload.id }}"
+              id_v1: "{{ event.payload.id_v1 | default('') }}"
+              changed_at: "{{ event.payload.motion.motion_report.changed | default('') }}"

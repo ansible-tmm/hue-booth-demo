@@ -1,3 +1,4 @@
 ---
 collections:
   - name: ansible.eda
+  - name: ipvsean.hue_booth_demo

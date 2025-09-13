@@ -62,7 +62,12 @@ async def main(queue: asyncio.Queue, args: Dict[str, Any]):
                         payload_obj: Any = json.loads(payload_text)
                     except json.JSONDecodeError:
                         payload_obj = payload_text
-                    event = {"topic": getattr(message, "topic", ""), "payload": payload_obj}
+                    topic_value = getattr(message, "topic", "")
+                    try:
+                        topic_str = str(topic_value)
+                    except Exception:
+                        topic_str = ""
+                    event = {"topic": topic_str, "payload": payload_obj}
                     await queue.put(event)
         except asyncio.CancelledError:
             log.info("MQTT plugin cancelled; exiting")
