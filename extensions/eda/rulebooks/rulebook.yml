@@ -1,5 +1,5 @@
 ---
-- name: Hue motion → AAP Demo Job
+- name: Hue motion → AAP Demo Job (sanity)
   hosts: all
 
   sources:
@@ -11,25 +11,32 @@
         tls: false
 
   rules:
-    # Sanity rule: prove we match every "motion" event
-    - name: Sanity: saw a motion-type event
+    # R1: Fire on every event to prove the pipeline is working
+    - name: R1 Always fire (v1)
+      condition: true
+      action:
+        print_event: {}
+
+    # R2: Narrow to motion-type events (note the bracket access for "type")
+    - name: R2 Motion-type seen (v1)
       condition:
         all:
           - event.payload is defined
-          - event.payload.type == "motion"
+          - event.payload["type"] == "motion"
       action:
         debug:
           msg: >-
-            MOTION EVENT: id={{ event.payload.id }}
+            MOTION EVENT (v1):
+            id={{ event.payload.id }}
             active={{ event.payload.motion.motion | default('n/a') }}
             at={{ event.payload.motion.motion_report.changed | default('') }}
 
-    # Fire only when motion is true
-    - name: Motion detected (fire job)
+    # R3: Only when motion is true
+    - name: R3 Motion detected -> Job (v1)
       condition:
         all:
           - event.payload is defined
-          - event.payload.type == "motion"
+          - event.payload["type"] == "motion"
           - event.payload.motion is defined
           - event.payload.motion.motion == true
       action:
