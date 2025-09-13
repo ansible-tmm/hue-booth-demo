@@ -1,5 +1,5 @@
 ---
-- name: Hue motion → Job (final)
+- name: Hue motion → Job (final v5)
   hosts: all
 
   sources:
@@ -11,15 +11,14 @@
         tls: false
 
   rules:
-    # Fire ONLY when the motion flag is true.
-    # Put this FIRST so no broader rule eats the event.
-    - name: Motion detected -> launch JT
+    # Fire ONLY when the motion flag is true (put FIRST)
+    - name: Motion detected -> print + launch JT
       condition:
-        all:
-          - event.payload is defined
-          - event.payload.motion is defined
-          - event.payload.motion.motion        # truthy check
+        any:
+          - event.payload.motion.motion            # truthy
+          - event.payload.motion.motion == true    # explicit boolean
       actions:
+        - print_event: {}   # proves the rule matched with a full [event] block
         - debug:
             msg: >-
               LAUNCHING JT: sensor={{ event.payload.id }}
@@ -33,12 +32,10 @@
                 id_v1: "{{ event.payload.id_v1 | default('') }}"
                 changed_at: "{{ event.payload.motion.motion_report.changed | default('') }}"
 
-    # Optional: log every motion event (true/false) for visibility.
-    # Keep this AFTER the job rule.
+    # Optional: log ALL motion events (true & false). Keep AFTER the job rule.
     - name: Motion event observed (log)
       condition:
         all:
-          - event.payload is defined
           - event.payload.motion is defined
       action:
         print_event: {}
