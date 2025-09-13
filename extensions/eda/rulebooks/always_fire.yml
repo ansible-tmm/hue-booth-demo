@@ -1,0 +1,23 @@
+---
+- name: Hue motion → Job (final v4)
+  hosts: all
+
+  sources:
+    - ipvsean.hue_booth_demo.mqtt_simple:
+        host: mqtt-broker
+        port: 1883
+        topics: [ "hue/motion/#" ]
+        tls: false
+
+  rules:
+    - name: TEST: force one-time JT launch
+      condition: true
+      actions:
+        - debug: { msg: "TEST: launching Demo Job Template from EDA" }
+        - run_job_template:
+            name: Demo Job Template
+            organization: Default
+            job_args:
+              extra_vars:
+                sensor_id: "TEST"
+                changed_at: "{{ now() }}"
