@@ -1,5 +1,5 @@
 ---
-- name: Hue motion → Job (final v2)
+- name: Hue motion → Job (final v3)
   hosts: all
 
   sources:
@@ -10,15 +10,15 @@
         tls: false
 
   rules:
-    # 1) Fire ONLY when motion is true
+    # Fire ONLY when motion turns true (use DOT access everywhere)
     - name: Motion detected -> print + launch JT
       condition:
         all:
           - event.payload is defined
-          - event.payload["motion"] is defined
-          - event.payload["motion"]["motion"] == true
+          - event.payload.motion is defined
+          - event.payload.motion.motion == true
       actions:
-        - print_event: {}   # <-- you will see a full [event] block when this matches
+        - print_event: {}   # you'll see a full [event] block when it matches
         - debug:
             msg: >-
               LAUNCHING JT: sensor={{ event.payload.id }}
@@ -32,11 +32,11 @@
                 id_v1: "{{ event.payload.id_v1 | default('') }}"
                 changed_at: "{{ event.payload.motion.motion_report.changed | default('') }}"
 
-    # 2) Helpful visibility on all motion events (true *and* false)
+    # Optional visibility for ALL motion events (true and false)
     - name: Motion event observed
       condition:
         all:
           - event.payload is defined
-          - event.payload["motion"] is defined
+          - event.payload.motion is defined
       action:
         print_event: {}
