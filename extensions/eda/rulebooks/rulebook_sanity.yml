@@ -1,0 +1,61 @@
+---
+- name: Hue motion → Sanity checks
+  hosts: all
+
+  sources:
+    - ipvsean.hue_booth_demo.mqtt_simple:
+        host: mqtt-broker
+        port: 1883
+        topics: [ "hue/motion/#" ]
+        tls: false
+
+  rules:
+    # R1: prove rules are firing at all (prints EVERY event)
+    - name: R1 print_event (v1)
+      condition: true
+      action:
+        print_event: {}
+
+    # R2: only events whose payload.type == "motion"
+    - name: R2 motion-type matched (v1)
+      condition:
+        all:
+          - event.payload is defined
+          - event.payload["type"] == "motion"
+      action:
+        debug:
+          msg: >-
+            MOTION EVENT (R2):
+            id={{ event.payload.id }}
+            active={{ event.payload.motion.motion | default('n/a') }}
+            at={{ event.payload.motion.motion_report.changed | default('') }}
+
+    # R3a: motion is truthy
+    - name: R3a motion true (truthy) (v1)
+      condition:
+        all:
+          - event.payload is defined
+          - event.payload["type"] == "motion"
+          - event.payload.motion is defined
+          - event.payload.motion.motion
+      action:
+        debug:
+          msg: >-
+            R3a WOULD LAUNCH JOB: id={{ event.payload.id }}
+            active={{ event.payload.motion.motion }}
+            at={{ event.payload.motion.motion_report.changed | default('') }}
+
+    # R3b: motion equals boolean true (explicit)
+    - name: R3b motion true (explicit) (v1)
+      condition:
+        all:
+          - event.payload is defined
+          - event.payload["type"] == "motion"
+          - event.payload.motion is defined
+          - event.payload.motion.motion == true
+      action:
+        debug:
+          msg: >-
+            R3b WOULD LAUNCH JOB: id={{ event.payload.id }}
+            active={{ event.payload.motion.motion }}
+            at={{ event.payload.motion.motion_report.changed | default('') }}
