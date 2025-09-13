@@ -1,5 +1,5 @@
 ---
-- name: Hue motion → Sanity checks (v2)
+- name: Hue motion → Sanity checks (v3)
   hosts: all
 
   sources:
@@ -10,12 +10,24 @@
         tls: false
 
   rules:
-    - name: R1 print_event (all) (v2)
+    # R1: baseline — prove rules run at all (prints EVERY event)
+    - name: R1 print_event (all) (v3)
       condition: true
       action:
         print_event: {}
 
-    - name: R2 print_event (type==motion) (v2)
+    # R1.5: echo what the engine/Jinja sees for the fields we use in conditions
+    - name: R1.5 echo fields (v3)
+      condition: true
+      action:
+        debug:
+          msg: >-
+            TYPE_DOT={{ event.payload.type | default('~UNDEF~') }}
+            TYPE_BRACKET={{ event.payload["type"] | default('~UNDEF~') }}
+            MOTION_FLAG={{ event.payload.motion.motion | default('~UNDEF~') }}
+
+    # R2: match when payload["type"] == "motion"
+    - name: R2 print_event (type==motion) (v3)
       condition:
         all:
           - event.payload is defined
@@ -23,7 +35,8 @@
       action:
         print_event: {}
 
-    - name: R3 print_event (motion==true) (v2)
+    # R3: match when motion flag is truthy
+    - name: R3 print_event (motion==true) (v3)
       condition:
         all:
           - event.payload is defined
