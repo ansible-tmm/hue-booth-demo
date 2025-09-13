@@ -1,42 +1,19 @@
 ---
-- name: Hue motion → AAP Demo Job (sanity)
+- name: Hue motion → Job (final)
   hosts: all
 
   sources:
     - ipvsean.hue_booth_demo.mqtt_simple:
         host: mqtt-broker
         port: 1883
-        topics:
-          - hue/motion/#
+        topics: [ "hue/motion/#" ]
         tls: false
 
   rules:
-    # R1: Fire on every event to prove the pipeline is working
-    - name: R1 Always fire (v1)
-      condition: true
-      action:
-        print_event: {}
-
-    # R2: Narrow to motion-type events (note the bracket access for "type")
-    - name: R2 Motion-type seen (v1)
+    # Fire ONLY when motion is true
+    - name: Motion detected -> Job
       condition:
         all:
-          - event.payload is defined
-          - event.payload["type"] == "motion"
-      action:
-        debug:
-          msg: >-
-            MOTION EVENT (v1):
-            id={{ event.payload.id }}
-            active={{ event.payload.motion.motion | default('n/a') }}
-            at={{ event.payload.motion.motion_report.changed | default('') }}
-
-    # R3: Only when motion is true
-    - name: R3 Motion detected -> Job (v1)
-      condition:
-        all:
-          - event.payload is defined
-          - event.payload["type"] == "motion"
           - event.payload.motion is defined
           - event.payload.motion.motion == true
       action:
@@ -48,3 +25,17 @@
               sensor_id: "{{ event.payload.id }}"
               id_v1: "{{ event.payload.id_v1 | default('') }}"
               changed_at: "{{ event.payload.motion.motion_report.changed | default('') }}"
+
+    # Optional: log any motion events (true *or* false) for visibility
+    - name: Motion event observed
+      condition:
+        all:
+          - event.payload.motion is defined
+      action:
+        print_event: {}
+
+    # Optional: last resort catch-all (put LAST!)
+    - name: Catch-all (debug)
+      condition: true
+      action:
+        print_event: {}
